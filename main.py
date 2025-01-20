@@ -149,7 +149,8 @@ def handle_click(pos):
 
 # Draw the menu screen
 def draw_menu():
-    screen.fill(BLACK)
+    DARK_BACKGROUND = (20, 20, 20)  # Very dark gray
+    screen.fill(DARK_BACKGROUND)
 
     title_font = pygame.font.SysFont("Arial", 50)
     title_text = title_font.render("Chess Game", True, TEXT_COLOR)
