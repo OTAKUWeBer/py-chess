@@ -176,7 +176,7 @@ def draw_menu():
 
     return button_2p, button_bot
 
-# Add this function to display the winner in a message box
+# winner msg
 def draw_winner_message(winner):
     message_font = pygame.font.SysFont("Arial", 40)
     message_text = message_font.render(f"{winner} won by checkmate!", True, TEXT_COLOR)
@@ -194,15 +194,9 @@ def draw_winner_message(winner):
     # Draw the message
     screen.blit(message_text, (box_x + 20, box_y + 20))
 
-    # Draw a "Quit" button in the top-right corner
-    quit_button = pygame.Rect(SCREEN_WIDTH - 150, 20, 120, 40)  # Positioned in the top-right corner
-    pygame.draw.rect(screen, BUTTON_COLOR, quit_button)
-    quit_button_text = font.render("Quit", True, TEXT_COLOR)
-    screen.blit(quit_button_text, quit_button.move(40, 10))
-
     pygame.display.flip()
 
-    return quit_button
+# Pawn_promotion to add
 
 
 # Initialize variables
