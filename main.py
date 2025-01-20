@@ -92,6 +92,15 @@ def draw_chessboard_with_labels(last_move=None):
                 label_y = y + SQUARE_SIZE // 2 - label_surface.get_height() - 10
                 screen.blit(label_surface, (label_x, label_y))
 
+    # Check if the king is in check and highlight it
+    if board.is_check():
+        king_square = board.king(board.turn)
+        king_col = king_square % 8
+        king_row = 7 - (king_square // 8)
+        king_x = X_OFFSET + king_col * SQUARE_SIZE
+        king_y = Y_OFFSET + king_row * SQUARE_SIZE
+        pygame.draw.rect(screen, (209, 72, 65), (king_x, king_y, SQUARE_SIZE, SQUARE_SIZE))  # Red color for check
+
 # Draw the pieces on the board
 def draw_pieces():
     for square in chess.SQUARES:
@@ -166,6 +175,35 @@ def draw_menu():
 
     return button_2p, button_bot
 
+# Add this function to display the winner in a message box
+def draw_winner_message(winner):
+    message_font = pygame.font.SysFont("Arial", 40)
+    message_text = message_font.render(f"{winner} won by checkmate!", True, TEXT_COLOR)
+    message_rect = message_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+
+    box_width = message_rect.width + 40
+    box_height = message_rect.height + 40
+    box_x = (SCREEN_WIDTH - box_width) // 2
+    box_y = (SCREEN_HEIGHT - box_height) // 2
+
+    # Draw a semi-transparent box
+    pygame.draw.rect(screen, (0, 0, 0, 150), (box_x, box_y, box_width, box_height))
+    pygame.draw.rect(screen, (255, 255, 255), (box_x, box_y, box_width, box_height), 5)  # White border
+
+    # Draw the message
+    screen.blit(message_text, (box_x + 20, box_y + 20))
+
+    # Draw a "Quit" button in the top-right corner
+    quit_button = pygame.Rect(SCREEN_WIDTH - 150, 20, 120, 40)  # Positioned in the top-right corner
+    pygame.draw.rect(screen, BUTTON_COLOR, quit_button)
+    quit_button_text = font.render("Quit", True, TEXT_COLOR)
+    screen.blit(quit_button_text, quit_button.move(40, 10))
+
+    pygame.display.flip()
+
+    return quit_button
+
+
 # Initialize variables
 clock = pygame.time.Clock()
 running = True
@@ -207,6 +245,17 @@ while running:
             draw_chessboard_with_labels(last_move)
             draw_pieces()
             draw_valid_moves(valid_moves)
+
+            if board.is_game_over():
+                winner = "White" if board.result() == "1-0" else "Black"  # Assuming checkmate or draw
+                quit_button = draw_winner_message(winner)
+
+                # Check if the quit button is clicked
+                for event in pygame.event.get():
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        if quit_button.collidepoint(event.pos):
+                            game_mode = None
+
             pygame.display.flip()
             clock.tick(FPS)
 
