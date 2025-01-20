@@ -76,13 +76,15 @@ def draw_chessboard_with_labels(last_move=None):
 
             label_color = BLACK if color == WHITE else WHITE
 
+            # abcd
             if row == 7:
                 label = chr(97 + col)
                 label_surface = font.render(label, True, label_color)
-                label_x = x + SQUARE_SIZE // 2 - label_surface.get_width() + 35
+                label_x = x + SQUARE_SIZE // 2 - label_surface.get_width() + 40
                 label_y = y + SQUARE_SIZE - label_surface.get_height() - 5
                 screen.blit(label_surface, (label_x, label_y))
-
+            
+            # 1-8
             if col == 0:
                 label = str(8 - row)
                 label_surface = font.render(label, True, label_color)
