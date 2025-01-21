@@ -168,7 +168,6 @@ def handle_pawn_promotion(square, color):
                 pygame.quit()
                 sys.exit()
 
-
 def handle_click(pos):
     global selected_square, valid_moves, last_move
 
@@ -236,9 +235,9 @@ def draw_menu():
     return button_2p, button_bot
 
 # winner msg
-def draw_winner_message(winner):
+def draw_game_over_message(message):
     message_font = pygame.font.SysFont("Arial", 40)
-    message_text = message_font.render(f"{winner} won by checkmate!", True, TEXT_COLOR)
+    message_text = message_font.render(message, True, TEXT_COLOR)
     message_rect = message_text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
 
     box_width = message_rect.width + 40
@@ -254,9 +253,6 @@ def draw_winner_message(winner):
     screen.blit(message_text, (box_x + 20, box_y + 20))
 
     pygame.display.flip()
-
-# Pawn_promotion to add
-
 
 # Initialize variables
 clock = pygame.time.Clock()
@@ -301,14 +297,27 @@ while running:
             draw_valid_moves(valid_moves)
 
             if board.is_game_over():
-                winner = "White" if board.result() == "1-0" else "Black"  # Assuming checkmate or draw
-                quit_button = draw_winner_message(winner)
-
-                # Check if the quit button is clicked
-                for event in pygame.event.get():
-                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                        if quit_button.collidepoint(event.pos):
-                            game_mode = None
+                if board.is_checkmate():
+                    winner = "White" if board.result() == "1-0" else "Black"
+                    reason = "Checkmate"
+                elif board.is_stalemate():
+                    winner = "Draw"
+                    reason = "Stalemate"
+                elif board.is_insufficient_material():
+                    winner = "Draw"
+                    reason = "Insufficient Material"
+                elif board.is_variant_draw():
+                    winner = "Draw"
+                    reason = "Game Draw"
+                elif board.is_repetition():
+                    winner = "Draw"
+                    reason = "threefold repetition"
+                else:
+                    winner = "No one"
+                    reason = "Draw"
+                
+                message = f"{reason} - {winner} wins!"
+                draw_game_over_message(message)
 
             pygame.display.flip()
             clock.tick(FPS)
