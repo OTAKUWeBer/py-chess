@@ -121,7 +121,54 @@ def draw_valid_moves(valid_moves):
         y = Y_OFFSET + row * SQUARE_SIZE + SQUARE_SIZE // 2
         pygame.draw.circle(screen, (0, 255, 0), (x, y), 10)
 
-# Handle mouse click events
+# Pawn promotion
+def handle_pawn_promotion(square, color):
+    options = ["queen", "rook", "bishop", "knight"]
+    promotion_images = {
+        option: pygame.transform.scale(
+            pygame.image.load(os.path.join(piece_image_path, f"{color}-{option}.png")),
+            (SQUARE_SIZE, SQUARE_SIZE)
+        )
+        for option in options
+    }
+    
+    # Box dimensions
+    box_size = 4 * SQUARE_SIZE
+    box_x = SCREEN_WIDTH // 2 - box_size // 2
+    box_y = SCREEN_HEIGHT // 2 - SQUARE_SIZE // 2
+
+    # Draw the box
+    box_rect = pygame.Rect(box_x, box_y, box_size, SQUARE_SIZE)
+    pygame.draw.rect(screen, (50, 50, 50), box_rect)  # Background color for the box
+    pygame.draw.rect(screen, (0, 0, 0), box_rect, 3)  # White border
+
+    # Draw the squares and images inside the box
+    promotion_rects = []
+    for i, option in enumerate(options):
+        square_x = box_x + i * SQUARE_SIZE
+        square_y = box_y
+        square_rect = pygame.Rect(square_x, square_y, SQUARE_SIZE, SQUARE_SIZE)
+        promotion_rects.append((square_rect, option))
+
+        # Draw the square and place the image
+        pygame.draw.rect(screen, (100, 100, 100), square_rect)  # Square background
+        pygame.draw.rect(screen, (0, 0, 0), square_rect, 2)  # Square border
+        screen.blit(promotion_images[option], (square_x, square_y))
+
+    pygame.display.flip()
+
+    # Wait for user to select a promotion piece
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                for rect, option in promotion_rects:
+                    if rect.collidepoint(event.pos):
+                        return option
+            elif event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+
+
 def handle_click(pos):
     global selected_square, valid_moves, last_move
 
@@ -136,6 +183,18 @@ def handle_click(pos):
     else:
         if square in valid_moves:
             move = chess.Move(selected_square, square)
+
+            # Handle pawn promotion
+            if board.piece_at(selected_square).piece_type == chess.PAWN and (square in chess.SQUARES[0:8] or square in chess.SQUARES[56:64]):
+                color = "white" if board.turn == chess.WHITE else "black"
+                promotion_choice = handle_pawn_promotion(square, color)
+                move.promotion = {
+                    "queen": chess.QUEEN,
+                    "rook": chess.ROOK,
+                    "bishop": chess.BISHOP,
+                    "knight": chess.KNIGHT
+                }[promotion_choice]
+
             if move in board.legal_moves:
                 board.push(move)
                 last_move = (selected_square, square)
