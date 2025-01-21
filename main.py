@@ -298,7 +298,7 @@ while running:
                 move = stockfish_move()
                 last_move = (move.from_square, move.to_square)
 
-            screen.fill((200, 200, 200))
+            screen.fill((0,0,0))
             draw_chessboard_with_labels(last_move)
             draw_pieces()
             draw_valid_moves(valid_moves)
