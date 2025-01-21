@@ -171,7 +171,14 @@ def handle_pawn_promotion(square, color):
 def handle_click(pos):
     global selected_square, valid_moves, last_move
 
+    # Calculate the column and row based on the mouse click position
     col, row = (pos[0] - X_OFFSET) // SQUARE_SIZE, (pos[1] - Y_OFFSET) // SQUARE_SIZE
+
+    # Ensure the click is within the bounds of the chessboard
+    if col < 0 or col >= 8 or row < 0 or row >= 8:
+        return valid_moves  # No valid move if the click is outside the board
+
+    # Calculate the square on the chessboard
     square = chess.square(col, 7 - row)
 
     if selected_square is None:
